@@ -2,8 +2,9 @@
 import os.path
 from concurrent.futures.thread import ThreadPoolExecutor
 
-import gogdl.api
+from gogdl.api import ApiHandler
 from gogdl import constants
+from gogdl.dl.dl_utils import get_readable_size
 import logging
 
 
@@ -14,6 +15,8 @@ class Manager:
         self.unknown_arguments = generic_manager.unknown_arguments
 
         self.platform = self.arguments.platform or "windows"
+
+        self.dry_run = self.arguments.dry_run
 
         if "path" in self.arguments:
             self.path = self.arguments.path     # Path for download
@@ -26,7 +29,7 @@ class Manager:
 
         self.allowed_threads = generic_manager.allowed_threads
 
-        self.api_handler: gogdl.api.ApiHandler = generic_manager.api_handler
+        self.api_handler: ApiHandler = generic_manager.api_handler
         self.stop_all_threads = False
 
         self.logger = logging.getLogger("extras")
@@ -76,7 +79,15 @@ class Manager:
 
         urls.extend([f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]])
 
-        self.logger.info(f"Downloading {len(urls)} extras...")
+        self.logger.info(f"There are {len(urls)} extras...")
 
+        if self.dry_run:
+            for url in urls:
+                with self.api_handler.session.get(url, stream=True) as response:
+                    filename: str = response.url.split("/")[-1]
+
+                num, sym = get_readable_size(int(response.headers["Content-Length"]))
+                self.logger.info(f"Would download: {filename}, size: {num:.1f} {sym}")
+            return
         with ThreadPoolExecutor(max_workers=self.allowed_threads) as ex:
             ex.map(self.download_file, urls)

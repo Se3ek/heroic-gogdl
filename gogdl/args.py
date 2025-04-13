@@ -109,6 +109,12 @@ def init_parser():
         help="Download offline installers"
     )
     extras_parser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="Gather files to download and log them without downloading them"
+    )
+    extras_parser.add_argument(
         "--platform",
         dest="platform",
         help="Desired platform for offline installers"
