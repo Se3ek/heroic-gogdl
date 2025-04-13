@@ -18,6 +18,8 @@ class Manager:
 
         self.dry_run = self.arguments.dry_run
 
+        self.patches = self.arguments.patches
+
         if "path" in self.arguments:
             self.path = self.arguments.path     # Path for download
         else:
@@ -49,8 +51,11 @@ class Manager:
             for chunk in response.iter_content(chunk_size=10 * 1024):
                 file.write(chunk)
 
-    def download(self):
-        # Get all the links that are available
+    def get_urls(self):
+        """
+        Gather the urls to download from
+        """
+
         game_info: dict = self.api_handler.get_game_details(self.game_id)
 
         self.logger.info(f"Downloading additional files for game {game_info["title"]} (id {self.game_id})")
@@ -84,6 +89,11 @@ class Manager:
                 urls.extend([f"{constants.GOG_EMBED}/{dl["manualUrl"]}" for dl in platform_content[platform]])
 
         urls.extend([f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]])
+
+        return urls
+
+    def download(self):
+        urls: list = self.get_urls()
 
         self.logger.info(f"There are {len(urls)} extras...")
 
