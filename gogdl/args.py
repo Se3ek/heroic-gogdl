@@ -68,7 +68,7 @@ def init_parser():
         "--platform",
         "--os",
         dest="platform",
-        help="Target opearting system",
+        help="Target operating system",
         choices=["windows", "osx", "linux"],
     )
     download_parser.add_argument(
@@ -100,9 +100,13 @@ def init_parser():
     extras_parser = subparsers.add_parser(
         "extras", help="Download extra files (wallpapers, soundtrack, etc)"
     )
-    extras_parser.add_argument("id", help="Game id")
+    extras_parser.add_argument("id",
+                               help="Game id")
     extras_parser.add_argument(
-        "--installers", dest="installers", action="store_true", help="Download offline installers"
+        "--installers",
+        dest="installers",
+        action="store_true",
+        help="Download offline installers"
     )
     extras_parser.add_argument(
         "--platform",
@@ -110,12 +114,23 @@ def init_parser():
         help="Desired platform for offline installers"
     )
     extras_parser.add_argument(
-        "--path", "-p", dest="path", help="Specify download path", required=True
+        "--path", "-p",
+        dest="path",
+        help="Specify download path",
+        required=True
     )
-    extras_parser.add_argument("--lang", "-l", dest="language", default="English", help="Specify game language")
-    extras_parser.add_argument("--branch", help="Choose build branch to use")
-    extras_parser.add_argument("--password", help="Password to access other branches")
-    extras_parser.add_argument("--force-gen", choices=["1", "2"], dest="force_generation", help="Force specific manifest generation (FOR DEBUGGING)")
+    extras_parser.add_argument("--lang", "-l",
+                               dest="language",
+                               default="English",
+                               help="Specify game language")
+    extras_parser.add_argument("--branch",
+                               help="Choose build branch to use")
+    extras_parser.add_argument("--password",
+                               help="Password to access other branches")
+    extras_parser.add_argument("--force-gen",
+                               choices=["1", "2"],
+                               dest="force_generation",
+                               help="Force specific manifest generation (FOR DEBUGGING)")
 
     # SIZE CALCULATING, AND OTHER MANIFEST INFO
 

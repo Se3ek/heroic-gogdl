@@ -4,7 +4,7 @@ GOG download module for [Heroic Games Launcher](https://github.com/Heroic-Games-
 
 ## Important note
 
-This is **not** user friendly cli, it's meant to be used by some other application wanting to download game files, manage cloud saves or conveniently launch the game
+This is **not** user-friendly cli, it's meant to be used by some other application wanting to download game files, manage cloud saves or conveniently launch the game
 
 ## Contributing
 
@@ -41,7 +41,7 @@ If you wish to test the gogdl in Heroic flatpak you likely need to build `gogdl`
 pip install pyinstaller
 ```
 
-- Build the binary (assuming you are in heroic-gogdl direcory)
+- Build the binary (assuming you are in heroic-gogdl directory)
 
 ```
 pyinstaller --onefile --name gogdl gogdl/cli.py
