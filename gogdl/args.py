@@ -96,6 +96,18 @@ def init_parser():
         help="Specify number of worker threads, by default number of CPU threads",
     )
 
+    # EXTRAS
+    extras_parser = subparsers.add_parser(
+        "extras", help="Download extra files (wallpapers, soundtrack, etc)"
+    )
+    extras_parser.add_argument("id", help="Game id")
+    extras_parser.add_argument(
+        "--installers", dest="installers", action="store_true", help="Download offline installers"
+    )
+    extras_parser.add_argument(
+        "--path", "-p", dest="path", help="Specify download path", required=True
+    )
+
     # SIZE CALCULATING, AND OTHER MANIFEST INFO
 
     calculate_size_parser = subparsers.add_parser(
