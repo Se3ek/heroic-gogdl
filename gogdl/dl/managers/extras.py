@@ -70,9 +70,15 @@ class Manager:
                     if not plat == self.platform:
                         continue
                     if not platform_content.get(plat):
-                        platform_content[plat] = [c for c in element[1][plat] if not c["name"].startswith("Patch ")]
+                        if self.patches:
+                            platform_content[plat] = [c for c in element[1][plat] if c["name"].startswith("Patch ")]
+                        else:
+                            platform_content[plat] = [c for c in element[1][plat] if not c["name"].startswith("Patch ")]
                     else:
-                        platform_content[plat].extend([c for c in element[1][plat] if not c["name"].startswith("Patch ")])
+                        if self.patches:
+                            platform_content[plat].extend([c for c in element[1][plat] if c["name"].startswith("Patch ")])
+                        else:
+                            platform_content[plat].extend([c for c in element[1][plat] if not c["name"].startswith("Patch ")])
 
             for platform in platform_content:
                 urls.extend([f"{constants.GOG_EMBED}/{dl["manualUrl"]}" for dl in platform_content[platform]])

@@ -106,7 +106,13 @@ def init_parser():
         "--installers",
         dest="installers",
         action="store_true",
-        help="Download offline installers"
+        help="Download offline installers, excluding patches"
+    )
+    extras_parser.add_argument(
+        "--patches",
+        dest="patches",
+        action="store_true",
+        help="Download offline installer patches"
     )
     extras_parser.add_argument(
         "--dry-run",
