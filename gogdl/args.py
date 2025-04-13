@@ -105,8 +105,17 @@ def init_parser():
         "--installers", dest="installers", action="store_true", help="Download offline installers"
     )
     extras_parser.add_argument(
+        "--platform",
+        dest="platform",
+        help="Desired platform for offline installers"
+    )
+    extras_parser.add_argument(
         "--path", "-p", dest="path", help="Specify download path", required=True
     )
+    extras_parser.add_argument("--lang", "-l", dest="language", default="English", help="Specify game language")
+    extras_parser.add_argument("--branch", help="Choose build branch to use")
+    extras_parser.add_argument("--password", help="Password to access other branches")
+    extras_parser.add_argument("--force-gen", choices=["1", "2"], dest="force_generation", help="Force specific manifest generation (FOR DEBUGGING)")
 
     # SIZE CALCULATING, AND OTHER MANIFEST INFO
 

@@ -12,6 +12,9 @@ class Manager:
         self.game_id: str = generic_manager.game_id
         self.arguments = generic_manager.arguments
         self.unknown_arguments = generic_manager.unknown_arguments
+
+        self.platform = self.arguments.platform or "windows"
+
         if "path" in self.arguments:
             self.path = self.arguments.path     # Path for download
         else:
@@ -53,9 +56,25 @@ class Manager:
         urls: list[str] = []
 
         if self.arguments.installers:
-            pass
-        else:
-            urls = [f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]]
+            # Get the specified platforms. Otherwise, take all of them
+
+            lang: str = self.arguments.language
+            platform_content: dict = dict()
+            for element in game_info["downloads"]:
+                if not element[0] == lang:
+                    continue
+                for plat in element[1]:
+                    if not plat == self.platform:
+                        continue
+                    if not platform_content.get(plat):
+                        platform_content[plat] = [c for c in element[1][plat] if not c["name"].startswith("Patch ")]
+                    else:
+                        platform_content[plat].extend([c for c in element[1][plat] if not c["name"].startswith("Patch ")])
+
+            for platform in platform_content:
+                urls.extend([f"{constants.GOG_EMBED}/{dl["manualUrl"]}" for dl in platform_content[platform]])
+
+        urls.extend([f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]])
 
         self.logger.info(f"Downloading {len(urls)} extras...")
 
