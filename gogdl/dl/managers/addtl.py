@@ -1,6 +1,7 @@
 # Manage downloading extra content (wallpapers, soundtracks, etc.)
 import os.path
 from concurrent.futures.thread import ThreadPoolExecutor
+from urllib.parse import unquote
 
 from gogdl.api import ApiHandler
 from gogdl import constants
@@ -42,7 +43,7 @@ class Manager:
         """
         response = self.api_handler.session.get(url, stream=True)
 
-        filename: str = response.url.split("/")[-1]
+        filename: str = unquote(response.url.split("/")[-1])
 
         self.logger.info(f"Downloading the file '{filename}'")
 
@@ -55,7 +56,7 @@ class Manager:
         Get the information from the source for a dry run.
         """
         with self.api_handler.session.get(url, stream=True) as response:
-            filename: str = response.url.split("/")[-1]
+            filename: str = unquote(response.url.split("/")[-1])
             num, sym = get_readable_size(int(response.headers["Content-Length"]))
 
         self.logger.info(f"Would download: {filename}, size: {num:.1f} {sym}")
