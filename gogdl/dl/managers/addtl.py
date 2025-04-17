@@ -50,6 +50,16 @@ class Manager:
             for chunk in response.iter_content(chunk_size=10 * 1024):
                 file.write(chunk)
 
+    def run_dry(self, url):
+        """
+        Get the information from the source for a dry run.
+        """
+        with self.api_handler.session.get(url, stream=True) as response:
+            filename: str = response.url.split("/")[-1]
+            num, sym = get_readable_size(int(response.headers["Content-Length"]))
+
+        self.logger.info(f"Would download: {filename}, size: {num:.1f} {sym}")
+
     def get_urls(self):
         """
         Get the urls for additional content.
@@ -85,12 +95,9 @@ class Manager:
         self.logger.info(f"There are {len(self.urls)} extras...")
 
         if self.dry_run:
-            for url in self.urls:
-                with self.api_handler.session.get(url, stream=True) as response:
-                    filename: str = response.url.split("/")[-1]
-
-                num, sym = get_readable_size(int(response.headers["Content-Length"]))
-                self.logger.info(f"Would download: {filename}, size: {num:.1f} {sym}")
-            return
-        with ThreadPoolExecutor(max_workers=self.allowed_threads) as ex:
-            ex.map(self.download_file, self.urls)
+            self.logger.info("In dry run mode...")
+            with ThreadPoolExecutor(max_workers=self.allowed_threads) as ex:
+                ex.map(self.run_dry, self.urls)
+        else:
+            with ThreadPoolExecutor(max_workers=self.allowed_threads) as ex:
+                ex.map(self.download_file, self.urls)
