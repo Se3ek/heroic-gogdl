@@ -6,7 +6,7 @@ import logging
 import json
 
 from gogdl import constants
-from gogdl.dl.managers import linux, v1, v2, extras
+from gogdl.dl.managers import linux, v1, v2, addtl
 
 @dataclass
 class UnsupportedPlatform(Exception):
@@ -68,9 +68,9 @@ class Manager:
 
     def setup_download_manager(self):
 
-        # For downloading extras, we can jump to that directly
-        if self.arguments.command == "extras":
-            self.download_manager = extras.Manager(self)
+        # For downloading additional files, we can jump to that directly
+        if self.arguments.command == "addtl":
+            self.download_manager = addtl.Manager(self)
             return
 
         # TODO: If content system for linux ever appears remove this if statement

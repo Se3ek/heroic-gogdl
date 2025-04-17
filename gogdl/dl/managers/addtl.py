@@ -34,8 +34,8 @@ class Manager:
         self.api_handler: ApiHandler = generic_manager.api_handler
         self.stop_all_threads = False
 
-        self.logger = logging.getLogger("extras")
-        self.logger.info("Initialized extras Download Manager")
+        self.logger = logging.getLogger("addtl")
+        self.logger.info("Initialized additial files Download Manager")
 
     def download_file(self, url):
         """

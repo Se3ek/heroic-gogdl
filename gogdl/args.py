@@ -96,9 +96,9 @@ def init_parser():
         help="Specify number of worker threads, by default number of CPU threads",
     )
 
-    # EXTRAS
+    # ADDITIONAL FILES
     extras_parser = subparsers.add_parser(
-        "extras", help="Download extra files (wallpapers, soundtrack, etc)"
+        "addtl", help="Download additional files (offline installers, patches and wallpapers, soundtrack, etc)"
     )
     extras_parser.add_argument("id",
                                help="Game id")
@@ -106,13 +106,19 @@ def init_parser():
         "--installers",
         dest="installers",
         action="store_true",
-        help="Download offline installers, excluding patches"
+        help="Download offline installers (excluding patches)"
     )
     extras_parser.add_argument(
         "--patches",
         dest="patches",
         action="store_true",
         help="Download offline installer patches"
+    )
+    extras_parser.add_argument(
+        "--extras",
+        dest="extras",
+        action="store_true",
+        help="Download extra files (wallpapers, soundtracks, etc.)"
     )
     extras_parser.add_argument(
         "--dry-run",
