@@ -121,6 +121,21 @@ def init_parser():
         help="Download extra files (wallpapers, soundtracks, etc.)"
     )
     extras_parser.add_argument(
+        "--with-dlcs", dest="dlcs", action="store_true", help="Should download all dlcs"
+    )
+    extras_parser.add_argument(
+        "--skip-dlcs", dest="dlcs", action="store_false", help="Should skip all dlcs"
+    )
+    extras_parser.add_argument(
+        "--dlcs",
+        dest="dlcs_list",
+        default=[],
+        help="List of dlc ids to download (separated by coma)",
+    )
+    extras_parser.add_argument(
+        "--dlc-only", dest="dlc_only", action="store_true", help="Download only DLC"
+    )
+    extras_parser.add_argument(
         "--dry-run",
         dest="dry_run",
         action="store_true",

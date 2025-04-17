@@ -23,6 +23,13 @@ class Manager:
         self.patches = self.arguments.patches
         self.extras = self.arguments.extras
 
+        self.dlcs_should_be_downloaded = self.arguments.dlcs or self.arguments.dlc_only
+        if self.arguments.dlcs_list:
+            self.dlcs_list = self.arguments.dlcs_list.split(",")
+        else:
+            self.dlcs_list = list()
+        self.dlc_only = self.arguments.dlc_only
+
         self.path = self.arguments.path if "path" in self.arguments else ""
 
         self.language = self.arguments.language
@@ -61,12 +68,10 @@ class Manager:
 
         self.logger.info(f"Would download: {filename}, size: {num:.1f} {sym}")
 
-    def get_urls(self):
+    def get_urls(self, game_info):
         """
         Get the urls for additional content.
         """
-
-        game_info: dict = self.api_handler.get_game_details(self.game_id)
 
         self.logger.info(f"Downloading additional files for game {game_info["title"]} (id {self.game_id})")
 
@@ -91,7 +96,16 @@ class Manager:
             self.urls.extend([f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]])
 
     def download(self):
-        self.get_urls()
+        game_info: dict = self.api_handler.get_game_details(self.game_id)
+
+        if not self.dlc_only:
+            # Get the urls from the base game entry
+            self.get_urls(game_info)
+
+        if self.dlcs_should_be_downloaded:
+            # Get urls for required dlcs
+            for dlc in game_info["dlcs"]:
+                self.get_urls(dlc)
 
         self.logger.info(f"There are {len(self.urls)} extras...")
 
