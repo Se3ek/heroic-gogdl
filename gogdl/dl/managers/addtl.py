@@ -18,21 +18,20 @@ class Manager:
 
         self.dry_run = self.arguments.dry_run
 
+        self.installers = self.arguments.installers
         self.patches = self.arguments.patches
+        self.extras = self.arguments.extras
 
-        if "path" in self.arguments:
-            self.path = self.arguments.path     # Path for download
-        else:
-            self.path = ""
-        if "support_path" in self.arguments:
-            self.support = self.arguments.support_path
-        else:
-            self.support = ""
+        self.path = self.arguments.path if "path" in self.arguments else ""
+
+        self.language = self.arguments.language
 
         self.allowed_threads = generic_manager.allowed_threads
 
         self.api_handler: ApiHandler = generic_manager.api_handler
         self.stop_all_threads = False
+
+        self.urls = list()  # Empty list for determined urls to be filled later
 
         self.logger = logging.getLogger("addtl")
         self.logger.info("Initialized additial files Download Manager")
@@ -53,52 +52,40 @@ class Manager:
 
     def get_urls(self):
         """
-        Gather the urls to download from
+        Get the urls for additional content.
         """
 
         game_info: dict = self.api_handler.get_game_details(self.game_id)
 
         self.logger.info(f"Downloading additional files for game {game_info["title"]} (id {self.game_id})")
 
-        # build a list of urls for the downloads
-        urls: list[str] = []
-
-        if self.arguments.installers:
-            # Get the specified platforms. Otherwise, take all of them
-
-            lang: str = self.arguments.language
-            platform_content: dict = dict()
-            for element in game_info["downloads"]:
-                if not element[0] == lang:
+        content: list = list()
+        for element in game_info["downloads"]:
+            if not element[0] == self.language:     # Filtering out other languages
+                continue
+            for plat in element[1]:
+                if not plat == self.platform:
                     continue
-                for plat in element[1]:
-                    if not plat == self.platform:
-                        continue
-                    if not platform_content.get(plat):
-                        if self.patches:
-                            platform_content[plat] = [c for c in element[1][plat] if c["name"].startswith("Patch ")]
-                        else:
-                            platform_content[plat] = [c for c in element[1][plat] if not c["name"].startswith("Patch ")]
-                    else:
-                        if self.patches:
-                            platform_content[plat].extend([c for c in element[1][plat] if c["name"].startswith("Patch ")])
-                        else:
-                            platform_content[plat].extend([c for c in element[1][plat] if not c["name"].startswith("Patch ")])
+                if self.patches:
+                    self.logger.info("Grabbing patches...")
+                    content.extend([c for c in element[1][plat] if c["name"].startswith("Patch ")])
+                if self.installers:
+                    self.logger.info("Grabbing offline installers...")
+                    content.extend([c for c in element[1][plat] if not c["name"].startswith("Patch ")])
 
-            for platform in platform_content:
-                urls.extend([f"{constants.GOG_EMBED}/{dl["manualUrl"]}" for dl in platform_content[platform]])
+            self.urls.extend([f"{constants.GOG_EMBED}/{dl["manualUrl"]}" for dl in content])
 
-        urls.extend([f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]])
-
-        return urls
+        if self.extras:
+            self.logger.info("Grabbing extra content...")
+            self.urls.extend([f"{constants.GOG_EMBED}/{extra["manualUrl"]}" for extra in game_info["extras"]])
 
     def download(self):
-        urls: list = self.get_urls()
+        self.get_urls()
 
-        self.logger.info(f"There are {len(urls)} extras...")
+        self.logger.info(f"There are {len(self.urls)} extras...")
 
         if self.dry_run:
-            for url in urls:
+            for url in self.urls:
                 with self.api_handler.session.get(url, stream=True) as response:
                     filename: str = response.url.split("/")[-1]
 
@@ -106,4 +93,4 @@ class Manager:
                 self.logger.info(f"Would download: {filename}, size: {num:.1f} {sym}")
             return
         with ThreadPoolExecutor(max_workers=self.allowed_threads) as ex:
-            ex.map(self.download_file, urls)
+            ex.map(self.download_file, self.urls)
